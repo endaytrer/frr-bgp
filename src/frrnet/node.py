@@ -18,11 +18,12 @@ class FrrSwitch(UserSwitch):
             config_path = pathlib.Path("config").joinpath(name)
         else:
             config_path = pathlib.Path(config_dir)
+            
         if not config_path.exists():
             raise Exception(f"config path of {name} ({str(config_path)}) not exist!")
+        self.config_path = config_path
         chown_recursive(config_path, "frr", "frr")
         super().__init__(name, privateDirs=[("/etc/frr", str(config_path)), "/run/frr"], **params)
-        self.config_path = config_path
         self.daemons = daemons
         self.controlIntf = None
         
