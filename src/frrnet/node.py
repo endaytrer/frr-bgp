@@ -13,14 +13,24 @@ class FrrSwitch(UserSwitch):
     daemons: list[Daemon]
     config_path: pathlib.Path
     
-    def __init__(self, name, config_dir: str | None = None, daemons: list[Daemon] = [], **params):
-        if config_dir == None:
-            config_path = pathlib.Path("config").joinpath(name)
+    def __init__(self, name, config_file: str | None = None, daemons: list[Daemon] = [], **params):
+        if config_file == None:
+            if os.path.exists(os.path.join("config", name + ".cfg")):
+                config_file = pathlib.Path("config").joinpath(name + ".cfg")
+            else:
+                config_file = pathlib.Path("config").joinpath(name + ".conf")
         else:
-            config_path = pathlib.Path(config_dir)
+            config_file = pathlib.Path(config_file)
             
-        if not config_path.exists():
-            raise Exception(f"config path of {name} ({str(config_path)}) not exist!")
+        if not config_file.exists():
+            raise Exception(f"config path of {name} ({str(config_file)}) not exist!")
+        
+        # create a temp directory for each switch
+        config_path = pathlib.Path("/tmp").joinpath("frrnet").joinpath(name)
+        config_path.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["cp", str(config_file), str(config_path.joinpath("frr.conf"))])
+        subprocess.run(["touch", str(config_path.joinpath("vtysh.conf"))])
+        
         self.config_path = config_path
         chown_recursive(config_path, "frr", "frr")
         super().__init__(name, privateDirs=[("/etc/frr", str(config_path)), "/run/frr"], **params)
@@ -40,7 +50,9 @@ class FrrSwitch(UserSwitch):
                 
     def terminate(self):
         super().terminate()
-        chown_recursive(self.config_path, "1000", "1000")
+        # remove the temp directory
+        if self.config_path.exists():
+            subprocess.run(["rm", "-rf", str(self.config_path)])
         
         
     

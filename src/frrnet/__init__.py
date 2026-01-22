@@ -1,6 +1,6 @@
 from mininet.topo import Topo
 from mininet.log import setLogLevel
-from mininet.cli import CLI
+from frrnet.cli import FrrCLI
 from frrnet.net import FrrNet
 from typing import Type, TypeVar
 
@@ -12,6 +12,6 @@ def frrnet_main(TopoClass: Type[T]):
     net = FrrNet(topo)
     
     net.start()
-    CLI(net)
+    FrrCLI(net)
     net.stop()
     
