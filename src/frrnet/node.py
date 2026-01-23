@@ -3,6 +3,7 @@ from mininet.node import Controller
 from typing import Literal, NamedTuple
 import pathlib
 import os
+import sys
 import subprocess
 Daemon = Literal["bgpd"]
 
@@ -15,10 +16,11 @@ class FrrSwitch(UserSwitch):
     
     def __init__(self, name, config_file: str | None = None, daemons: list[Daemon] = [], **params):
         if config_file == None:
-            if os.path.exists(os.path.join("config", name + ".cfg")):
-                config_file = pathlib.Path("config").joinpath(name + ".cfg")
+            config_dir = pathlib.Path(sys.argv[0]).parent.joinpath("config")
+            if os.path.exists(os.path.join(config_dir, name + ".cfg")):
+                config_file = config_dir.joinpath(name + ".cfg")
             else:
-                config_file = pathlib.Path("config").joinpath(name + ".conf")
+                config_file = config_dir.joinpath(name + ".conf")
         else:
             config_file = pathlib.Path(config_file)
             

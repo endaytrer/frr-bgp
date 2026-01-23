@@ -32,7 +32,6 @@ uv sync
 Run an example:
 ```bash
 # Use 001_two_switches as example
-cd examples/001_two_switches
-sudo uv run main.py
+sudo uv run examples/001_two_switches/main.py
 ```
 
