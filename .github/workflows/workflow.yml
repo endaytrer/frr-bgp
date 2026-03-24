@@ -3,6 +3,7 @@ name: Publish Package
 on:
   release:
     types: [published]
+  push:
   workflow_dispatch:
 
 permissions:
