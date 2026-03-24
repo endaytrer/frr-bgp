@@ -7,9 +7,17 @@ import sys
 import subprocess
 Daemon = Literal["bgpd"]
 
+FRR_SEARCH_PATH = ["/usr/libexec/frr", "/usr/lib/frr", "/usr/lib64/frr", "/usr/local/libexec/frr", "/usr/local/lib/frr", "/usr/local/lib64/frr"]
+
+def find_frr_daemons() -> pathlib.Path:
+    for path in FRR_SEARCH_PATH:
+        if os.path.exists(pathlib.Path(path) / "zebra"):
+            return pathlib.Path(path)
+    raise Exception("frr daemons not found")
+
 def chown_recursive(dir: pathlib.Path, user: str, group: str):
     subprocess.run(["chown", "-R", f"{user}:{group}", str(dir)])
-    
+
 class FrrSwitch(Switch):
     daemons: list[Daemon]
     config_path: pathlib.Path
@@ -40,12 +48,15 @@ class FrrSwitch(Switch):
         self.controlIntf = None
         
     def start(self, _controllers: list[Controller]):
+        prefix = find_frr_daemons()
         
         for daemon in ["zebra", "mgmtd", "staticd"]:
-            self.cmd(f"/usr/libexec/frr/{daemon} -d")
+            daemon_exe = prefix / daemon
+            self.cmd(f"{daemon_exe} -d")
             
         for daemon in self.daemons:
-            self.cmd(f"/usr/libexec/frr/{daemon} -d")
+            daemon_exe = prefix / daemon
+            self.cmd(f"{daemon_exe} -d")
     
         self.cmd("vtysh -b")
                 
