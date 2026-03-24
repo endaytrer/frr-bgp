@@ -1,12 +1,11 @@
 [project]
 name = "frrnet"
 version = "0.1.0"
-description = "Add your description here"
+description = "Mininet with FRR switches"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "mininet>=2.3.0.dev6",
-    "pybatfish>=2024.7.22.1569",
 ]
 
 [build-system]
