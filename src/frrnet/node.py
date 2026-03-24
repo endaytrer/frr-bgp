@@ -1,4 +1,4 @@
-from mininet.node import UserSwitch
+from mininet.node import Switch
 from mininet.node import Controller
 from typing import Literal, NamedTuple
 import pathlib
@@ -10,7 +10,7 @@ Daemon = Literal["bgpd"]
 def chown_recursive(dir: pathlib.Path, user: str, group: str):
     subprocess.run(["chown", "-R", f"{user}:{group}", str(dir)])
     
-class FrrSwitch(UserSwitch):
+class FrrSwitch(Switch):
     daemons: list[Daemon]
     config_path: pathlib.Path
     
@@ -39,8 +39,7 @@ class FrrSwitch(UserSwitch):
         self.daemons = daemons
         self.controlIntf = None
         
-    def start(self, controllers: list[Controller]):
-        super().start(controllers)
+    def start(self, _controllers: list[Controller]):
         
         for daemon in ["zebra", "mgmtd", "staticd"]:
             self.cmd(f"/usr/libexec/frr/{daemon} -d")
