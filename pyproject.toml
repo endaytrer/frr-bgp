@@ -1,6 +1,6 @@
 [project]
 name = "frrnet"
-version = "0.2.0a1"
+version = "0.2.0"
 description = "Mininet with FRR switches"
 readme = "README.md"
 requires-python = ">=3.10"
