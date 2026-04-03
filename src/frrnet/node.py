@@ -1,6 +1,6 @@
 from mininet.node import Switch
 from mininet.node import Controller
-from typing import Literal, NamedTuple
+from typing import Literal
 import pathlib
 import os
 import sys
@@ -44,15 +44,11 @@ class FrrSwitch(Switch):
         self.config_path = config_path
         chown_recursive(config_path, "frr", "frr")
         super().__init__(name, privateDirs=[("/etc/frr", str(config_path)), "/run/frr"], **params)
-        self.daemons = daemons
+        self.daemons = ["zebra", "mgmtd", "staticd", *daemons]
         self.controlIntf = None
         
     def start(self, _controllers: list[Controller]):
         prefix = find_frr_daemons()
-        
-        for daemon in ["zebra", "mgmtd", "staticd"]:
-            daemon_exe = prefix / daemon
-            self.cmd(f"{daemon_exe} -d")
             
         for daemon in self.daemons:
             daemon_exe = prefix / daemon

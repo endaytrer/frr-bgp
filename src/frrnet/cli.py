@@ -1,19 +1,25 @@
 from typing import override
 from mininet.cli import CLI
 from mininet.log import error
+from frrnet.node import FrrSwitch
 import sys
 
 class FrrCLI(CLI):
     helpStr = (
-        'You may also send a network command to a node using:\n'
-        '  <node> command {args}\n'
+        'You can send a **shell** command to a host using:\n'
+        '  <host> command {args}\n'
         'For example:\n'
-        '  mininet> h1 show ip bgp\n'
+        '  mininet> h1 ifconfig\n'
         '\n'
-        'If you want to send a shell command to node, use `sh` beforehands:\n'
-        '  <node> bash command {args}\n'
+        'You can send a **network** command to a switch using:\n'
+        '  <switch> command {args}\n'
         'For example:\n'
-        '  mininet> h1 sh ifconfig\n'
+        '  mininet> s1 show ip bgp\n'
+        '\n'
+        'If you want to send a shell command to a switch, use `sh` beforehands:\n'
+        '  <switch> sh command {args}\n'
+        'For example:\n'
+        '  mininet> s1 sh ifconfig\n'
         '\n'
         'The interpreter automatically substitutes IP addresses\n'
         'for node names when a node is the first arg, so commands\n'
@@ -42,23 +48,25 @@ class FrrCLI(CLI):
                 return
             node = self.mn[ first ]
             rest = args.split( ' ' )
-            
-            if rest[0] != 'sh':
-                rest = f"vtysh -c '{' '.join(rest)}'"
-                node.sendCmd( rest )
-                self.waitForNode( node )
-                return
-            else:
-                rest = rest[1:]
-                # Substitute IP addresses for node names in command
-                # If updateIP() returns None, then use node name
-                rest = [ self.mn[ arg ].defaultIntf().updateIP() or arg
-                         if arg in self.mn else arg
-                         for arg in rest ]
-                rest_cmd = ' '.join(rest).replace("'", "\\'")
-                rest = f"sh -c '{rest_cmd}'"
-                node.sendCmd( rest )
-                self.waitForNode( node )
+            if isinstance(node, FrrSwitch):
+                if rest[0] not in ['sh', 'bash', 'vtysh', 'ping', 'traceroute']: # allow certain utility commands
+                    rest = f"vtysh -c '{' '.join(rest)}'"
+                    node.sendCmd( rest )
+                    self.waitForNode( node )
+                    return
+                if rest[0] in ['sh']:
+                    rest = rest[1:]
+            # Substitute IP addresses for node names in command
+            # If updateIP() returns None, then use node name
+            rest = [ self.mn[ arg ].defaultIntf().updateIP() or arg
+                    if arg in self.mn else arg
+                    for arg in rest ]
+            rest_cmd = ' '.join(rest).replace("'", "\\'")
+            rest = f"sh -c '{rest_cmd}'"
+            node.sendCmd( rest )
+            self.waitForNode( node )
+            return
+                
 
         else:
             error( '*** Unknown command: %s\n' % line )
