@@ -53,6 +53,10 @@ class FrrSwitch(Switch):
         for daemon in self.daemons:
             daemon_exe = prefix / daemon
             self.cmd(f"{daemon_exe} -d")
+        
+        # To increase throughput, enable multipath hash policy for ipv4 and ipv6
+        self.cmd("sysctl -w net.ipv4.fib_multipath_hash_policy=1")
+        self.cmd("sysctl -w net.ipv6.fib_multipath_hash_policy=1")
     
         self.cmd("vtysh -b")
                 
