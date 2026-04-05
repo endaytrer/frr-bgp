@@ -16,10 +16,10 @@ class FrrCLI(CLI):
         'For example:\n'
         '  mininet> s1 show ip bgp\n'
         '\n'
-        'If you want to send a shell command to a switch, use `sh` beforehands:\n'
-        '  <switch> sh command {args}\n'
+        'If you want to send a shell command to a switch, use `bash` beforehands:\n'
+        '  <switch> bash command {args}\n'
         'For example:\n'
-        '  mininet> s1 sh ifconfig\n'
+        '  mininet> s1 bash ifconfig\n'
         '\n'
         'The interpreter automatically substitutes IP addresses\n'
         'for node names when a node is the first arg, so commands\n'
@@ -49,12 +49,12 @@ class FrrCLI(CLI):
             node = self.mn[ first ]
             rest = args.split( ' ' )
             if isinstance(node, FrrSwitch):
-                if rest[0] not in ['sh', 'bash', 'vtysh', 'ping', 'traceroute']: # allow certain utility commands
+                if rest[0] not in ['bash', 'vtysh', 'ping', 'traceroute']: # allow certain utility commands, no sh for `show` confusion
                     rest = f"vtysh -c '{' '.join(rest)}'"
                     node.sendCmd( rest )
                     self.waitForNode( node )
                     return
-                if rest[0] in ['sh']:
+                if rest[0] in ['bash']:
                     rest = rest[1:]
             # Substitute IP addresses for node names in command
             # If updateIP() returns None, then use node name

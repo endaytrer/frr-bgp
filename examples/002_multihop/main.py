@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from frrnet import frrnet_main
-from mininet.topo import Topo
+from frrnet.topo import FrrTopo
 
-class MyTopo(Topo):
+class MyTopo(FrrTopo):
 
     def build( self ):
 

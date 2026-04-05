@@ -1,7 +1,8 @@
-from mininet.topo import Topo
+#!/usr/bin/env python3
 from frrnet import frrnet_main
+from frrnet.topo import FrrTopo
 
-class MyTopo(Topo):
+class MyTopo(FrrTopo):
     def build(self):
         a    = self.addSwitch("a",    dpid="51", daemons=["bgpd"])
         s    = self.addSwitch("s",    dpid="41", daemons=["bgpd"])

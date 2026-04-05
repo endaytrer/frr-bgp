@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 from frrnet import frrnet_main
 from frrnet.topo import FrrTopo
-from mininet.cli import CLI
-from mininet.log import setLogLevel
 
 class MyTopo(FrrTopo):
     "Simple topology example."

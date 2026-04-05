@@ -1,8 +1,8 @@
+#!/usr/bin/env python3
 from frrnet import frrnet_main
-from mininet.topo import Topo
+from frrnet.topo import FrrTopo
 
-
-class MyTopo(Topo):
+class MyTopo(FrrTopo):
     def build(self):
         h1 = self.addHost("h1", ip="1.1.1.1/24", defaultRoute="via 1.1.1.2")
         r1 = self.addSwitch("r1", daemons=["bgpd"])
